@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# ----------- VARIABLES -----------
+PRINCIPAL_NAME="my-app-service"                     # Name of the resource
+RESOURCE_TYPE="Microsoft.Web/sites"                 # e.g., Microsoft.ManagedIdentity/userAssignedIdentities, Microsoft.Web/sites
+RESOURCE_GROUP="your-resource-group"
+KEYVAULT_NAME="your-keyvault-name"
+
+# ----------- GET VALUES -----------
+PRINCIPAL_ID=$(az resource show \
+  --name "$PRINCIPAL_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --resource-type "$RESOURCE_TYPE" \
+  --query identity.principalId -o tsv)
+
+KEYVAULT_ID=$(az keyvault show --name "$KEYVAULT_NAME" --resource-group "$RESOURCE_GROUP" --query id -o tsv)
+
+# ----------- ASSIGN ROLE -----------
+az role assignment create \
+  --assignee "$PRINCIPAL_ID" \
+  --role "Key Vault Secrets User" \
+  --scope "$KEYVAULT_ID"

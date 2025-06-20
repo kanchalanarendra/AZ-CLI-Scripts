@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# ----------- VARIABLES -----------
+GROUP_NAME="My Security Team"
+KEYVAULT_NAME="your-keyvault-name"
+RESOURCE_GROUP="your-resource-group"
+
+# ----------- GET VALUES -----------
+GROUP_ID=$(az ad group show --group "$GROUP_NAME" --query id -o tsv)
+KEYVAULT_ID=$(az keyvault show --name "$KEYVAULT_NAME" --resource-group "$RESOURCE_GROUP" --query id -o tsv)
+
+# ----------- ASSIGN ROLE -----------
+az role assignment create \
+  --assignee "$GROUP_ID" \
+  --role "Key Vault Secrets User" \
+  --scope "$KEYVAULT_ID"
